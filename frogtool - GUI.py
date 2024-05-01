@@ -14,7 +14,7 @@ drive_combobox = None
 
 def browse_drive():
     global drive_combobox
-    drives = [drive.device for drive in psutil.disk_partitions()]
+    drives = [drive.device for drive in psutil.disk_partitions()] if os.name == "nt" else [drive.mountpoint for drive in psutil.disk_partitions()]
     drive_combobox['values'] = drives
 
 def int_to_4_bytes_reverse(src_int):
@@ -36,8 +36,7 @@ except ImportError:
     ImageDraw = None
     image_lib_avail = False
 
-from sys import platform
-if platform == "win32":
+if os.name == "nt":
     import ctypes
     if ctypes.windll:
         ctypes.windll.kernel32.SetConsoleTitleW("frogtool")
@@ -174,7 +173,7 @@ def run():
         system = system_var.get()
 
         if not drive:
-            messagebox.showerror("Error", "No se ha seleccionado un dispositivo.")
+            print("No se ha seleccionado un dispositivo.")
             return
 
         try:
@@ -185,7 +184,7 @@ def run():
             show_popup()
 
         except StopExecution:
-            messagebox.showerror("Error", "Error al actualizar la lista de juegos.")
+            print("Error al actualizar la lista de juegos.")
 
     drive_label = tk.Label(root, text="Ubicación de la tarjeta SD SF2000:")
     drive_combobox = ttk.Combobox(root, state="readonly", width=37)
